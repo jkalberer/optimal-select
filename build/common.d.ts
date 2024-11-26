@@ -16,6 +16,6 @@ export declare const getCommonAncestor: (elements: HTMLElement[], options?: Opti
  * @param  {Array.<HTMLElement>} elements - [description]
  * @return {Object}                       - [description]
  */
-export declare function getCommonProperties(elements: HTMLElement[]): CommonProperties;
+export declare function getCommonProperties(elements: HTMLElement[], { ignore }?: Options): CommonProperties;
 export {};
 //# sourceMappingURL=common.d.ts.map

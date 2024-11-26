@@ -5,10 +5,7 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./build",
-    "lib": [
-      "es2016",
-      "dom"
-    ],
-    "allowJs": true,
+    "lib": ["esnext", "dom"],
+    "allowJs": true
   }
 }

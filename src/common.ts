@@ -4,6 +4,7 @@
  * Process collections for similarities.
  */
 
+import { DEFAULT_IGNORE } from './match';
 import { Options } from './types';
 
 type CommonProperties = { classes: string[]; attributes: Record<string, string>; tag: string | null };
@@ -54,89 +55,52 @@ export const getCommonAncestor = (elements: HTMLElement[], options: Options = {}
  * @param  {Array.<HTMLElement>} elements - [description]
  * @return {Object}                       - [description]
  */
-export function getCommonProperties(elements: HTMLElement[]): CommonProperties {
+export function getCommonProperties(elements: HTMLElement[], { ignore }: Options = {}): CommonProperties {
   const commonProperties: CommonProperties = {
     classes: [],
     attributes: {},
     tag: null,
   };
 
-  elements.forEach((element) => {
-    let { classes: commonClasses, attributes: commonAttributes } = commonProperties;
-    const commonTag = commonProperties.tag;
+  const elementsToCheck = [...elements];
+  let current = elementsToCheck.pop();
+  if (current != null) {
+    commonProperties.classes = Array.from(current.classList).filter(
+      (clazz) => ignore?.class == null || ignore.class(clazz),
+    );
+    commonProperties.attributes = Object.values(current.attributes)
+      .filter(({ name, value }) => {
+        return (
+          ((ignore == null || ignore.attribute?.(name, value)) ?? true) &&
+          (ignore?.shouldRunDefaultAttributeIgnore === false || DEFAULT_IGNORE.attribute(name))
+        );
+      })
+      .reduce((acc, attribute) => ({ ...acc, [attribute.name]: attribute.value }), {});
+    commonProperties.tag = current.tagName;
+  }
 
-    // ~ classes
-    if (commonClasses !== undefined) {
-      const classValue = element.getAttribute('class');
-      if (classValue != null) {
-        const classes = classValue.trim().split(' ');
-        if (!commonClasses.length) {
-          commonProperties.classes = classes;
-        } else {
-          commonClasses = commonClasses.filter((entry) => classes.some((name) => name === entry));
-          if (commonClasses.length) {
-            commonProperties.classes = commonClasses;
-          } else {
-            commonProperties.classes = [];
-          }
-        }
-      } else {
-        commonProperties.classes = [];
-      }
+  while (elementsToCheck.length) {
+    current = elementsToCheck.pop();
+    if (current == null) {
+      break;
     }
 
-    // ~ attributes
-    if (commonAttributes !== undefined) {
-      const elementAttributes = element.attributes;
-      const attributes: Record<string, string> = {};
-      for (let ii = 0; ii < elementAttributes.length; ii += 1) {
-        const attribute = elementAttributes[ii];
-        const attributeName = attribute.name;
-        // NOTE: workaround detection for non-standard phantomjs NamedNodeMap behaviour
-        // (issue: https://github.com/ariya/phantomjs/issues/14634)
-        if (attribute != null && attributeName !== 'class') {
-          attributes[attributeName] = attribute.value;
-        }
-      }
+    const classSet = new Set(Array.from(current.classList));
+    commonProperties.classes = commonProperties.classes.filter((clazz) => classSet.has(clazz));
 
-      const attributesNames = Object.keys(attributes);
-      const commonAttributesNames = Object.keys(commonAttributes);
-
-      if (attributesNames.length) {
-        if (!commonAttributesNames.length) {
-          commonProperties.attributes = attributes;
-        } else {
-          commonAttributes = commonAttributesNames.reduce(
-            (nextCommonAttributes, name) => {
-              const value = commonAttributes[name];
-              if (value === attributes[name]) {
-                nextCommonAttributes[name] = value;
-              }
-              return nextCommonAttributes;
-            },
-            {} as Record<string, string>,
-          );
-          if (Object.keys(commonAttributes).length) {
-            commonProperties.attributes = commonAttributes;
-          } else {
-            commonProperties.attributes = {};
-          }
-        }
-      } else {
-        commonProperties.attributes = {};
+    const attributeMap = new Map(
+      Object.values(current.attributes).map((attribute) => [attribute.name, attribute.value]),
+    );
+    Object.entries(commonProperties.attributes).forEach(([key, value]) => {
+      if (attributeMap.has(key) === false || attributeMap.get(key) !== value) {
+        delete commonProperties.attributes[key];
       }
+    });
+
+    if (commonProperties.tag != null && commonProperties.tag !== current.tagName) {
+      commonProperties.tag = null;
     }
-
-    // ~ tag
-    if (commonTag != null) {
-      const tag = element.tagName.toLowerCase();
-      if (commonTag == null) {
-        commonProperties.tag = tag;
-      } else if (tag !== commonTag) {
-        commonProperties.tag = null;
-      }
-    }
-  });
+  }
 
   return commonProperties;
 }

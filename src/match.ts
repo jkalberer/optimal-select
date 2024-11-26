@@ -6,7 +6,7 @@
 
 import { CheckFn, Options } from './types';
 
-const defaultIgnore = {
+export const DEFAULT_IGNORE = {
   attribute(attributeName: string): boolean {
     return ['style', 'data-reactid', 'data-react-checksum'].includes(attributeName);
   },
@@ -57,7 +57,7 @@ function findAttributesPattern(
       currentIgnore = ignore.class ?? ignore.attribute;
     }
 
-    const currentDefaultIgnore = defaultIgnore.attribute;
+    const currentDefaultIgnore = ignore.shouldRunDefaultAttributeIgnore === true ? DEFAULT_IGNORE.attribute : undefined;
     if (checkIgnore(currentIgnore, attributeName, attributeValue, currentDefaultIgnore)) {
       // eslint-disable-next-line no-continue
       continue;

@@ -44,8 +44,8 @@ export const getSingleSelector = (inputElement: HTMLElement, options: Options = 
   return optimized;
 };
 
-function getCommonSelectors(elements: HTMLElement[]): [string] {
-  const { classes, attributes, tag } = getCommonProperties(elements);
+function getCommonSelectors(elements: HTMLElement[], options: Options = {}): [string] {
+  const { classes, attributes, tag } = getCommonProperties(elements, options);
 
   const selectorPath = [];
 

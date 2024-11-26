@@ -38,8 +38,8 @@ const getSingleSelector = (inputElement, options = {}) => {
     return optimized;
 };
 exports.getSingleSelector = getSingleSelector;
-function getCommonSelectors(elements) {
-    const { classes, attributes, tag } = (0, common_1.getCommonProperties)(elements);
+function getCommonSelectors(elements, options = {}) {
+    const { classes, attributes, tag } = (0, common_1.getCommonProperties)(elements, options);
     const selectorPath = [];
     if (tag != null) {
         selectorPath.push(tag);

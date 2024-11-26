@@ -5,8 +5,8 @@
  * Retrieve selector for a node.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.match = void 0;
-const defaultIgnore = {
+exports.match = exports.DEFAULT_IGNORE = void 0;
+exports.DEFAULT_IGNORE = {
     attribute(attributeName) {
         return ['style', 'data-reactid', 'data-react-checksum'].includes(attributeName);
     },
@@ -42,7 +42,7 @@ function findAttributesPattern(priority, element, ignore) {
         if (attributeName === 'class') {
             currentIgnore = ignore.class ?? ignore.attribute;
         }
-        const currentDefaultIgnore = defaultIgnore.attribute;
+        const currentDefaultIgnore = ignore.shouldRunDefaultAttributeIgnore === true ? exports.DEFAULT_IGNORE.attribute : undefined;
         if (checkIgnore(currentIgnore, attributeName, attributeValue, currentDefaultIgnore)) {
             // eslint-disable-next-line no-continue
             continue;
