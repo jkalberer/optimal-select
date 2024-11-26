@@ -3,22 +3,13 @@
  *
  * Convenience helpers.
  */
-
 /**
  * Create an array with the DOM nodes of the list
  *
  * @param  {NodeList}             nodes - [description]
  * @return {Array.<HTMLElement>}        - [description]
  */
-export function convertNodeList (nodes) {
-  const { length } = nodes
-  const arr = new Array(length)
-  for (var i = 0; i < length; i++) {
-    arr[i] = nodes[i]
-  }
-  return arr
-}
-
+export function convertNodeList(nodes: NodeList): Array<HTMLElement>;
 /**
  * Escape special characters and line breaks as a simplified version of 'CSS.escape()'
  *
@@ -27,7 +18,5 @@ export function convertNodeList (nodes) {
  * @param  {String?} value - [description]
  * @return {String}        - [description]
  */
-export function escapeValue (value) {
-  return value && value.replace(/['"`\\/:\?&!#$%^()[\]{|}*+;,.<=>@~]/g, '\\$&')
-                       .replace(/\n/g, '\A')
-}
+export function escapeValue(value: string | null): string;
+//# sourceMappingURL=utilities.d.ts.map

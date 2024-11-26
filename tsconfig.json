@@ -1,0 +1,14 @@
+{
+  "extends": "@audioeye/eslint-config-typescript/tsconfig.json",
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "lib", "e2e", "build"],
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./build",
+    "lib": [
+      "es2016",
+      "dom"
+    ],
+    "allowJs": true,
+  }
+}
